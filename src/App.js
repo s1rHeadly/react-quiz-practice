@@ -1,23 +1,20 @@
-import logo from './logo.svg';
-import './App.css';
+import Header from './components/Header.js';
+import Main from './components/Main.js';
+import { LOCAL_URL } from './utils/helpers.js';
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+const App = () =>{
+
+  console.log(LOCAL_URL)
+
+ return (
+    <div className="app">
+      <Header/>
+
+      <Main>
+        <p>1/15</p>
+        <p>Question</p>
+      </Main>
+
     </div>
   );
 }
