@@ -1,57 +1,94 @@
-import { useState, useReducer} from "react";
-
+import { useState, useReducer } from "react";
 
 
 const initialState = {
   count: 0,
-}
-
-const reducerFtn = (state,action) => {
-  if(action.type === 'value'){
-   state = [...state, {count: action.payload}]
-  }
-
+  step: 1,
 }
 
 
-function DateCounter() {
-  const [count, setCount] = useState(0);
-  const [step, setStep] = useState(1);
+function reducerFunc(state, action){
+ switch (action.type) {
+  case 'reset':
+    return{
+      count: 0,
+      step: 1
+    }
 
-
-  const [state, dispatch] = useReducer(reducerFtn, initialState)
+  case 'count_value':
+    return{
+      ...state,
+      count: action.payload
+    }
   
+  case 'step_value':
+    return{
+      ...state,
+      step: action.payload
+    }
+  case 'increment':
+    return{
+      ...state,
+      count: state.count + state.step
+    }
+  
+    case 'decrement':
+      return{
+        ...state,
+        count: state.count - state.step
+      }
  
+  default:
+   return state;
+ }
+}
+
+const DateCounter = () => {
+  //state 
+  // const [count, setCount] = useState(0);
+  // const [step, setStep] = useState(1);
+
+const [state, dispatch] = useReducer(reducerFunc, initialState)
+console.log('render', state)
+
+  //functions
 
   // This mutates the date object.
   const date = new Date("june 21 2027");
-  date.setDate(date.getDate() + count);
+  date.setDate(date.getDate() + state.count);
 
-  const dec = function () {
-    // setCount((count) => count - 1);
-    setCount((count) => count - step);
-  };
-
-  const inc = function () {
-    // setCount((count) => count + 1);
-    setCount((count) => count + step);
-  };
-
-  const defineCount = function (e) {
-   //  setCount(Number(e.target.value));
+  function dec() {
     dispatch({
-      type: "value",
+      type: 'decrement'
+    })
+  };
+
+
+  function inc () {
+    dispatch({
+      type: 'increment'
+    })
+  };
+
+  function defineCount(e) {
+    // setCount(Number(e.target.value));
+    dispatch({
+      type: 'count_value',
+      payload: Number(e.targe.value),
+    })
+  };
+
+ function defineStep(e) {
+    dispatch({
+      type: 'step_value',
       payload: Number(e.target.value)
     })
   };
 
-  const defineStep = function (e) {
-    setStep(Number(e.target.value));
-  };
-
-  const reset = function () {
-    setCount(0);
-    setStep(1);
+  function reset() {
+   dispatch({
+    type: 'reset'
+   })
   };
 
   return (
@@ -61,15 +98,15 @@ function DateCounter() {
           type="range"
           min="0"
           max="10"
-          value={step}
+          value={state.step}
           onChange={defineStep}
         />
-        <span>{step}</span>
+        <span>{state.step}</span>
       </div>
 
       <div>
         <button onClick={dec}>-</button>
-        <input value={count} onChange={defineCount} />
+        <input value={state.count} onChange={defineCount} />
         <button onClick={inc}>+</button>
       </div>
 
