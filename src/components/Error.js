@@ -15,7 +15,7 @@ Error.propTypes = {
 }
 
 Error.defaultProps = {
-  text: 'There was an error fecthing questions.',
+  text: 'There was an error fetching questions.',
   icon: '💥'
 }
 

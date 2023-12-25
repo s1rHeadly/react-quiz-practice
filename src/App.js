@@ -1,104 +1,110 @@
 import { useEffect, useReducer } from 'react';
 import Header from './components/Header.js';
 import Main from './components/Main.js';
+import Loader from './components/Loader.js';
+import Error from './components/Error.js';
+import StartScreen from './components/StartScreen.js';
+import Question from './components/Question.js';
 import { LOCAL_URL } from './utils/helpers.js';
 
 
+
 const initialState = {
-  data: [],
-  isLoading: false,
-  error: null
+  questions: [],
+  status: '', // choose between 'loading, error, ready, active, finished'
 }
 
 
 function reducerFunc(state, action){
   switch (action.type) {
+   
     case 'loading':
-      return {
+      return{
         ...state,
-        isLoading: true
+        status: 'loading'
+      }
+
+    case 'dataReceived':
+      return{
+          ...state,
+          questions: action.payload,
+          status: 'ready'
       }
     
-      case 'failed':
-        return {
-          ...state,
-          error: action.payload
-        }
+    case 'dataFailed':
+      return{
+        ...state,
+        status: "error"
+      }
 
-        case 'success':
-          return {
-            ...state,
-            isLoading: false,
-            error: null,
-            data: action.payload
-          }
-  
+    case 'start':
+      return {
+        ...state,
+        status: 'active'
+      }
     default:
       return state;
   }
 }
 
+
+
 const App = () => { 
 
+  // reducer state
   const [state, dispatch] = useReducer(reducerFunc, initialState)
+  const {questions, status} = state;
 
+const numQuestions = questions.length;
+
+
+  //effects
 useEffect(() => {
 
-  const controller = new AbortController();
+ // dispatch loading reducer to loading
+ dispatch({
+  type: 'loading'
+})
+
 
   const fetchData = async(url) => {
-    // dispatch loading reducer to loading
-    dispatch({
-      type: 'loading'
-    })
-
+   
     try {
       
-      const response = await fetch(url, { signal: controller.signal});
-    if(!response.ok){
-        // dispatch error to the reducer
+      const response = await fetch(url)
+   
+      if(response.status === 200){
+        const data = await response.json();
+        // dispatch the data and update the status with this case type
         dispatch({
-          type: 'failed',
-          payload: response.error,
+          type: 'dataReceived',
+          payload: data,
         })
-    }
+        return;
+      }
 
-    if(response.status === 200){
-      const data = await response.json();
-      // dispatch success and pass the data to the reducer
-      dispatch({
-        type: 'success',
-        payload: data,
-      })
-
-    }
-
-
-    } catch (error) {
-      //dispatch error reducer
-      dispatch({
-        type: 'failed',
-        payload: error,
-      })
-    }
+      } catch (error) {
+        //dispatch error reducer
+        dispatch({
+          type: 'dataFailed',
+        })
+      }
   }
 
-
   fetchData(LOCAL_URL)
-
-  return(() => {
-    controller.abort();
-  })
  
 }, []);
+
 
  return (
     <div className="app">
       <Header/>
 
       <Main>
-        <p>1/15</p>
-        <p>Question</p>
+       {status === 'loading' && <Loader />}
+       {status === 'error' && <Error />}
+       {status === 'ready' && <StartScreen numQuestions={numQuestions} dispatch={dispatch}/>}
+       {status === 'active' && <Question />}
       </Main>
 
     </div>
