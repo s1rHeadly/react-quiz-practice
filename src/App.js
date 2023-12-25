@@ -12,6 +12,8 @@ import { LOCAL_URL } from './utils/helpers.js';
 const initialState = {
   questions: [],
   status: '', // choose between 'loading, error, ready, active, finished'
+  index: 0,
+  answer: null,
 }
 
 
@@ -42,6 +44,12 @@ function reducerFunc(state, action){
         ...state,
         status: 'active'
       }
+    
+    case 'newAnswer':
+    return{
+      ...state,
+     answer: action.payload,
+    }
     default:
       return state;
   }
@@ -53,30 +61,28 @@ const App = () => {
 
   // reducer state
   const [state, dispatch] = useReducer(reducerFunc, initialState)
-  const {questions, status} = state;
+  const {questions, status, index, answer} = state;
 
-const numQuestions = questions.length;
+  const numQuestions = questions.length;
 
 
   //effects
-useEffect(() => {
 
- // dispatch loading reducer to loading
- dispatch({
+useEffect(() => {
+ 
+ dispatch({ // dispatch loading reducer to loading
   type: 'loading'
 })
-
-
+  // fetch function
   const fetchData = async(url) => {
    
     try {
-      
       const response = await fetch(url)
    
       if(response.status === 200){
         const data = await response.json();
-        // dispatch the data and update the status with this case type
-        dispatch({
+        
+        dispatch({ // dispatch the data and update the status with this case type
           type: 'dataReceived',
           payload: data,
         })
@@ -84,8 +90,7 @@ useEffect(() => {
       }
 
       } catch (error) {
-        //dispatch error reducer
-        dispatch({
+        dispatch({   //dispatch error reducer
           type: 'dataFailed',
         })
       }
@@ -104,7 +109,7 @@ useEffect(() => {
        {status === 'loading' && <Loader />}
        {status === 'error' && <Error />}
        {status === 'ready' && <StartScreen numQuestions={numQuestions} dispatch={dispatch}/>}
-       {status === 'active' && <Question />}
+       {status === 'active' && <Question question={questions[index]} dispatch={dispatch} answer={answer}/>}
       </Main>
 
     </div>
