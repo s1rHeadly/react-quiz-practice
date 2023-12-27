@@ -48,7 +48,7 @@ function reducerFunc(state, action){
       }
     
     case 'newAnswer':
-      // gets the current question
+      // gets the current question when selected item is clicked (see options.js)
       const currentQuestion = state.questions.at(state.index)
      
       return{
