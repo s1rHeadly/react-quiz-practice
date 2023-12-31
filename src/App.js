@@ -6,6 +6,7 @@ import Error from './components/Error.js';
 import StartScreen from './components/StartScreen.js';
 import Question from './components/Question.js';
 import NextQuestBtn from './components/NextQuestBtn.js';
+import Progress from './components/Progress.js';
 import { LOCAL_URL } from './utils/helpers.js';
 
 
@@ -78,9 +79,21 @@ const App = () => {
 
   // reducer state
   const [state, dispatch] = useReducer(reducerFunc, initialState)
-  const {questions, status, index, answer} = state;
+  const {questions, status, index, answer, points} = state;
 
+  //derived state
   const numQuestions = questions.length;
+  const totalPossiblePoints = questions.reduce((total, item) => {
+      const {points} = item;
+      total += points;
+      return total
+  }, 0);
+
+
+
+
+
+
 
 
   //effects
@@ -128,6 +141,7 @@ useEffect(() => {
        {status === 'ready' && <StartScreen numQuestions={numQuestions} dispatch={dispatch}/>}
        {status === 'active' &&
        <>
+       <Progress numQuestions={numQuestions} index={index} points={points} totalPossiblePoints={totalPossiblePoints} answer={answer}/>
        <Question question={questions[index]} dispatch={dispatch} answer={answer}/>
        <NextQuestBtn dispatch={dispatch} answer={answer}/>
        </>

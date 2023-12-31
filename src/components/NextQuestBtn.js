@@ -1,7 +1,8 @@
 import React from 'react'
 
 const NextQuestBtn = ({dispatch, answer}) => {
-  console.log(answer)
+  
+  // if the answer is not clicked, then hide the next question btn
   if(answer === null) return;
 
   return (
