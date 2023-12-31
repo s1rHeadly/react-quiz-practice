@@ -7,6 +7,7 @@ import StartScreen from './components/StartScreen.js';
 import Question from './components/Question.js';
 import NextQuestBtn from './components/NextQuestBtn.js';
 import Progress from './components/Progress.js';
+import Finished from './components/Finished.js';
 import { LOCAL_URL } from './utils/helpers.js';
 
 
@@ -67,6 +68,18 @@ function reducerFunc(state, action){
         index: state.index++, // adding one to the index value
         answer: null, // reset the question so the last state update doesnt carry over
       }
+    
+    case 'finish':
+      return{
+        ...state,
+        status: 'finished'
+      }
+    
+    case 'restart':
+    return{
+      ...state,
+      status: 'ready'
+    }
    
     default:
       return state;
@@ -143,9 +156,10 @@ useEffect(() => {
        <>
        <Progress numQuestions={numQuestions} index={index} points={points} totalPossiblePoints={totalPossiblePoints} answer={answer}/>
        <Question question={questions[index]} dispatch={dispatch} answer={answer}/>
-       <NextQuestBtn dispatch={dispatch} answer={answer}/>
+       <NextQuestBtn dispatch={dispatch} answer={answer} index={index} numQuestions={numQuestions}/>
        </>
        }
+       {status === 'finished' && <Finished totalPossiblePoints={totalPossiblePoints} points={points} dispatch={dispatch}/>}
       </Main>
 
     </div>
